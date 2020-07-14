@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	oldKeyOptionName    = "oldkey"
+	oldKeyOptionName = "oldkey"
 )
 
 var rotateCmd = &cmds.Command{
@@ -54,17 +54,17 @@ environment variable:
 	},
 	Run: func(req *cmds.Request, res cmds.ResponseEmitter, env cmds.Environment) error {
 		cctx := env.(*oldcmds.Context)
-		nBitsForKeypair, _ := req.Options[bitsOptionName].(int)
+		nBitsForKeypair, nBitsGiven := req.Options[bitsOptionName].(int)
 		algorithm, _ := req.Options[algorithmOptionName].(string)
 		oldKey, ok := req.Options[oldKeyOptionName].(string)
 		if !ok {
 			return fmt.Errorf("keystore name for backing up old key must be provided")
 		}
-		return doRotate(os.Stdout, cctx.ConfigRoot, oldKey, algorithm, nBitsForKeypair)
+		return doRotate(os.Stdout, cctx.ConfigRoot, oldKey, algorithm, nBitsForKeypair, nBitsGiven)
 	},
 }
 
-func doRotate(out io.Writer, repoRoot string, oldKey string, algorithm string, nBitsForKeypair int) error {
+func doRotate(out io.Writer, repoRoot string, oldKey string, algorithm string, nBitsForKeypair int, nBitsGiven bool) error {
 	// Open repo
 	repo, err := fsrepo.Open(repoRoot)
 	if err != nil {
@@ -79,10 +79,17 @@ func doRotate(out io.Writer, repoRoot string, oldKey string, algorithm string, n
 	}
 
 	// Generate new identity
-	identity, err := config.CreateIdentity(out, []options.KeyGenerateOption{
-		options.Key.Size(nBitsForKeypair),
-		options.Key.Type(algorithm),
-	})
+	var identity config.Identity
+	if nBitsGiven {
+		identity, err = config.CreateIdentity(out, []options.KeyGenerateOption{
+			options.Key.Size(nBitsForKeypair),
+			options.Key.Type(algorithm),
+		})
+	} else {
+		identity, err = config.CreateIdentity(out, []options.KeyGenerateOption{
+			options.Key.Type(algorithm),
+		})
+	}
 	if err != nil {
 		return fmt.Errorf("creating identity (%v)", err)
 	}

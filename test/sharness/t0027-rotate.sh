@@ -60,9 +60,9 @@ test_rotate() {
         '
 
         test_kill_ipfs_daemon
+
+        test_done
 }
 test_rotate 'rsa'
 test_rotate 'ed25519'
 test_rotate ''
-
-test_done
