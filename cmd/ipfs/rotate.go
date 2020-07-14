@@ -13,8 +13,6 @@ import (
 )
 
 const (
-	algorithmDefault    = options.RSAKey
-	algorithmOptionName = "algorithm"
 	oldKeyOptionName    = "oldkey"
 )
 
