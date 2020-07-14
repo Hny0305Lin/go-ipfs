@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	algorithmDefault    = options.Ed25519Key
+	algorithmDefault    = options.RSAKey
 	algorithmOptionName = "algorithm"
 	oldKeyOptionName    = "oldkey"
 )
@@ -36,7 +36,7 @@ environment variable:
 	Options: []cmds.Option{
 		cmds.StringOption(oldKeyOptionName, "o", "Keystore name for the old/rotated-out key."),
 		cmds.StringOption(algorithmOptionName, "a", "Cryptographic algorithm to use for key generation.").WithDefault(algorithmDefault),
-		cmds.IntOption(bitsOptionName, "b", "Number of bits to use in the generated RSA private key.").WithDefault(nBitsForKeypairDefault),
+		cmds.IntOption(bitsOptionName, "b", "Number of bits to use in the generated RSA private key."),
 	},
 	PreRun: func(req *cmds.Request, env cmds.Environment) error {
 		cctx := env.(*oldcmds.Context)
