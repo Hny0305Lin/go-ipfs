@@ -8,7 +8,10 @@ test_description="Test rotate command"
 test_rotate() {
         TEST_ALG=$1
 
-        test_init_ipfs
+        test_expect_success "ipfs init" '
+        export IPFS_PATH="$(pwd)/.ipfs" &&
+        ipfs init --profile=test -a=rsa -b=2048 > /dev/null
+        '
 
         test_expect_success "Save first ID and key" '
         ipfs id -f="<id>" > first_id &&
@@ -61,8 +64,13 @@ test_rotate() {
 
         test_kill_ipfs_daemon
 
-        test_done
+        test_expect_success "clean up ipfs dir" '
+        rm -rf "$IPFS_PATH"
+        '
+
 }
 test_rotate 'rsa'
 test_rotate 'ed25519'
 test_rotate ''
+
+test_done
